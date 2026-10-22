@@ -134,7 +134,8 @@ const STATUS={new:["Brief received",""],planning:["Planning",""],awaiting_plan:[
 const STEP_OF={new:0,planning:1,awaiting_plan:1,generating:2,qa:2,awaiting_review:3,revising:3,rendering:4,review_final:4,done:5};
 const FORMATS=["Match the reference video","Let Claude decide","News debate","UGC testimonial","Problem → solution","Split-screen reaction","Text-on-screen / meme","Demo walkthrough","Founder / expert talk","Before / after","Festival moment"];
 
-let db=null,assets=null,downloads=null,user=null,uid=null,canWrite=null;
+let db=null,assets=null,downloads=null,user=null,uid=null,canWrite=null,mcp=null,isOwner=false;
+const RUN_TASK="trig_01HnKHbsYu8gwETa8ExmNSVB"; // scheduled task on the operator's computer that makes the videos
 let jobs=[],lessons=[],cur=null,unsubJob=[],newFiles={ref:null,extra:[]};
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -231,6 +232,7 @@ function renderNew(){
         reference:ref,reference_link:$("#f-reflink").value.trim(),extra,review_mode:document.querySelector("input[name=mode]:checked").value,
         notes:$("#f-notes").value.trim(),status:"new",created:now,updated:now,created_by:uid||null});
       toast("Brief sent");location.hash="job-"+id;
+      if(isOwner&&mcp)startRun(id,true);
     }catch(err){btn.disabled=false;
       $("#formMsg").textContent=err?.code==="no_assets"?"File upload needs Editor access. Send the brief without files and paste a link instead.":
         err?.code==="invalid_argument"?"You can view this studio but not send briefs. Ask for Editor access.":"Could not send. Check your connection and try again.";}
@@ -262,7 +264,7 @@ function renderJob(st){
   app.innerHTML=`<p><a href="#jobs" class="muted">← Briefs</a></p>
   <div class="spread"><div><div class="slate"><h1>${esc(j.title)}</h1><span class="id mono">${esc(j.id)}</span></div>
     <p class="sub">${esc(j.product?.name||"")} · ${esc(j.format||"")} · ${esc(j.length||"")} · ${j.review_mode==="auto"?"final only":"review each step"}</p></div>
-    <div>${chip(j.status)}</div></div>
+    <div class="row">${chip(j.status)}${isOwner&&mcp?`<button class="btn primary" id="runBtn">${j.status==="new"?"Make video":"Continue / apply feedback"}</button>`:""}</div></div>
   <div class="steps">${STEPS.map(([k,l],i)=>`<div class="step ${i<stepIx?"done":i===stepIx?"now":""}"><b>${esc(l)}</b>${i===stepIx&&j.status_note?esc(j.status_note):""}</div>`).join("")}</div>
   ${pending?`<p class="notice" style="margin-top:16px">${pending} item${pending>1?"s":""} waiting for your approval below. Approve, or write what to change and Claude will redo it.</p>`:""}
   <div class="grid2">
@@ -298,6 +300,7 @@ function renderJob(st){
     try{await db.collection("jobs/"+j.id+"/notes").add({text:v,from:"client",by:uid||null,at:new Date().toISOString()});
       await db.doc("jobs/"+j.id).update({has_new_feedback:true,updated:new Date().toISOString()});
       t.value="";drafts[t.dataset.draft]="";toast("Note sent")}catch(e){toast("Only editors can send notes")}};
+  const rb=$("#runBtn");if(rb)rb.onclick=()=>startRun(j.id);
   const dl=$("#dlBtn");if(dl)dl.onclick=async()=>{if(!downloads){window.open(j.final.url,"_blank");return}
     try{dl.disabled=true;const blob=await (await fetch(j.final.url)).blob();await downloads.save({filename:(j.title||"ad").replace(/[^\w\- ]+/g,"").trim().replace(/\s+/g,"_")+"_v"+(j.final.version||1)+".mp4",data:blob})}
     catch(e){if(e?.code&&e.code!=="cancelled")toast("Download did not start. Try again.")}finally{dl.disabled=false}};
@@ -326,6 +329,19 @@ async function feedback(jobId,itemId,status,text,ta){
   }catch(e){toast("Only editors can review. Ask for Editor access.")}
 }
 
+/* ---------- start work on the operator's computer ---------- */
+async function startRun(jobId,quiet){
+  const b=$("#runBtn");if(b)b.disabled=true;
+  try{
+    await mcp.callTool("Claude Code Remote","fire_trigger",{trigger_id:RUN_TASK,text:"Job id: "+jobId});
+    await db.doc("jobs/"+jobId).update({status_note:"Claude started working on your computer",run_requested:new Date().toISOString(),updated:new Date().toISOString()});
+    toast("Started. Progress shows here; keep your laptop, Chrome and Flow open.");
+  }catch(e){
+    const m={consent_required:"Allow the Claude Code Remote connector for this page, then press again.",server_not_connected:"Connect Claude Code Remote in claude.ai connectors, then press again.",needs_reauth:"Reconnect Claude Code Remote in claude.ai connectors."}[e?.code];
+    toast(m||"Could not start the run. Ask Claude in chat: studio sync karo.");
+  }finally{if(b)b.disabled=false}
+}
+
 /* ---------- lessons ---------- */
 function renderLessons(){
   const app=$("#app");
@@ -339,8 +355,9 @@ function renderLessons(){
 route();
 (async()=>{
   const C=window.claude; if(!C?.use)return;
-  [db,assets,downloads,user]=await Promise.all([C.use("db"),C.use("assets"),C.use("downloads"),C.use("user")]);
+  [db,assets,downloads,user,mcp]=await Promise.all([C.use("db"),C.use("assets"),C.use("downloads"),C.use("user"),C.use("mcp")]);
   try{uid=user?await user.id():null}catch(e){}
+  try{isOwner=user?await user.isOwner():false}catch(e){}
   if(!db){route();return}
   db.collection("jobs").onSnapshot(s=>{jobs=s.docs.map(d=>({...d.data(),id:d.id}));const v=view();if(v==="jobs")renderJobs()},()=>{});
   db.collection("lessons").onSnapshot(s=>{lessons=s.docs.map(d=>({...d.data(),id:d.id}));if(view()==="learnings")renderLessons()},()=>{});
