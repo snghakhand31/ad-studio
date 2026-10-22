@@ -1,0 +1,92 @@
+{
+  "output": "final.mp4",
+  "captions": true,
+  "news": {
+    "channel_a": "K360",
+    "channel_b": "NEWS",
+    "clock": "08:17 PM",
+    "left_name": "राहुल मेहता",
+    "left_role": "एंकर",
+    "right_name": "पं. हरिशंकर शास्त्री",
+    "right_role": "ज्योतिषाचार्य",
+    "ticker_label": "TOP NEWS"
+  },
+  "ticker": [
+    "दिवाली की तैयारियाँ ज़ोरों पर",
+    "क्या फ़ॉरवर्ड मैसेज से बिगड़ते हैं रिश्ते?",
+    "देश-विदेश की बड़ी खबरों के लिए देखते रहिए"
+  ],
+  "scenes": [
+    {
+      "layout": "news",
+      "headline_top": "क्या फ़ॉरवर्ड मैसेज से बिगड़ते हैं रिश्ते?",
+      "headline_bottom": "पंडित जी का बड़ा दावा!",
+      "left": {
+        "clip": "../../assets/library/anchor_listen_loop.mp4"
+      },
+      "right": {
+        "clip": "clips/g1.mp4"
+      },
+      "bottom": [
+        {
+          "clip": "clips/b1.mp4"
+        }
+      ],
+      "audio": {
+        "from": "right"
+      },
+      "caption": "अगर मेरी बात **गलत** निकले | तो यहीं लाइव टीवी पर | ये **फ़ोन तोड़** दूँगा!",
+      "duration": 6.2
+    },
+    {
+      "layout": "news",
+      "headline_top": "दिवाली से पहले जान लें ये बात",
+      "headline_bottom": "अपने नाम से भेजें शुभकामना",
+      "left": {
+        "clip": "../../assets/library/anchor_listen_loop.mp4",
+        "start": 6.2
+      },
+      "right": {
+        "clip": "clips/g2.mp4"
+      },
+      "bottom": [
+        {
+          "clip": "clips/b2.mp4"
+        }
+      ],
+      "audio": {
+        "from": "right"
+      },
+      "caption": "इस दिवाली **फ़ॉरवर्ड मैसेज** मत भेजिए | अपने **नाम और फ़ोटो** से | शुभकामना भेजिए | रिश्ते **मीठे** होते हैं",
+      "duration": 7.9
+    },
+    {
+      "layout": "full",
+      "clips": [
+        {
+          "clip": "clips/ss2.png"
+        },
+        {
+          "clip": "clips/ss1.png"
+        },
+        {
+          "clip": "clips/ss3.png"
+        }
+      ],
+      "audio": {
+        "file": "clips/g3.mp4"
+      },
+      "caption_y": 1760,
+      "caption": "**रंग ऐप** खोलिए | अपना **नाम और फ़ोटो** डालिए | हर त्योहार की शुभकामना | सीधे **व्हाट्सऐप** पर भेजिए",
+      "duration": 7.5
+    },
+    {
+      "layout": "endcard",
+      "image": "clips/icon.png",
+      "image_width": 420,
+      "duration": 2.8,
+      "cta": "**रंग ऐप** डाउनलोड करें|हर एहसास का अपना रंग"
+    }
+  ],
+  "voice_fx": true
+}

@@ -1,0 +1,6 @@
+{
+  "studios": [
+    {"name": "Y2G Ad Studio", "client": "internal / Rang", "url": "https://claude.ai/artifact/TN7jzi42G9xSLTv8xc3rMN", "source": "studio/studio.html"}
+  ],
+  "note": "One Studio per client (every editor of a Studio sees all its briefs). To add a client: publish studio/studio.html as a NEW artifact (no url), add it here, share it with the client by email as Editor."
+}

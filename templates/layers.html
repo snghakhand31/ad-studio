@@ -1,0 +1,84 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:Anton;src:url(fonts/anton-latin-400-normal.woff2)}
+@font-face{font-family:Mukta;font-weight:700;src:url(fonts/mukta-devanagari-700-normal.woff2)}
+@font-face{font-family:Mukta;font-weight:800;src:url(fonts/mukta-devanagari-800-normal.woff2)}
+@font-face{font-family:Mukta;font-weight:800;src:url(fonts/mukta-latin-800-normal.woff2);unicode-range:U+0000-00FF}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{background:transparent;font-family:Mukta,sans-serif}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden}
+.abs{position:absolute}
+/* top headline */
+#top{left:0;top:0;width:1080px;height:120px;background:linear-gradient(#fff,#e9e9e9);display:flex;align-items:center;border-bottom:4px solid #b30000}
+#top .txt{flex:1;padding:0 22px;font-weight:800;font-size:50px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1}
+#logo{width:130px;height:120px;background:#c40000;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:Anton;line-height:.95}
+#logo .a{font-size:44px}#logo .b{font-size:24px;background:#fff;color:#c40000;padding:0 8px;margin-top:4px}
+#logo .c{font-size:18px;margin-top:6px;letter-spacing:1px}
+/* panels */
+.divider{left:538px;top:120px;width:4px;height:640px;background:#7a0000}
+.plate{top:676px;height:84px;background:rgba(255,255,255,.96);text-align:center;font-weight:800;color:#222;line-height:1.05;padding-top:8px}
+.plate .n{font-size:32px}.plate .r{font-size:26px;color:#b30000}
+#pl{left:0;width:538px}#pr{left:542px;width:538px}
+/* breaking */
+#brk{left:0;top:760px;width:1080px;height:140px;background:linear-gradient(90deg,#8c0000,#d10000 40%,#8c0000);display:flex;align-items:center;justify-content:center;gap:22px;border-top:4px solid #ffd400;border-bottom:4px solid #ffd400}
+#brk .w{font-family:Anton;font-size:104px;color:#fff;letter-spacing:2px;text-shadow:3px 3px 0 #500}
+#brk .y{font-family:Anton;font-size:104px;color:#c40000;background:#ffd400;padding:0 18px;line-height:1.15}
+/* bottom headline */
+#bot{left:0;top:1740px;width:1080px;height:100px;background:linear-gradient(#a30000,#6d0000);color:#fff;font-weight:800;font-size:54px;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden;border-top:4px solid #ffd400}
+/* ticker base */
+#tk{left:0;top:1840px;width:1080px;height:80px;background:#fff;display:flex;align-items:center}
+#tk .lab{width:230px;height:80px;background:#c40000;color:#fff;font-family:Anton;font-size:40px;display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,88% 0,100% 50%,88% 100%,0 100%)}
+/* live bug */
+#live{left:24px;top:144px;background:#e00000;color:#fff;font-family:Anton;font-size:36px;padding:2px 16px;border-radius:6px}
+/* ticker strip */
+#strip{position:absolute;left:0;top:0;height:80px;display:inline-flex;align-items:center;white-space:nowrap;font-weight:800;font-size:40px;color:#111;background:#fff;padding-right:80px}
+#strip span.dot{color:#c40000;margin:0 26px}
+/* caption */
+#cap{position:absolute;left:0;top:0;display:inline-block;max-width:960px;text-align:center;font-weight:800;font-size:64px;line-height:1.25;color:#fff;padding:10px 26px;background:rgba(0,0,0,.72);border-radius:18px}
+#cap b{color:#ffd400}
+#cap.cs-outline{background:none;font-size:76px;-webkit-text-stroke:10px #000;paint-order:stroke fill;text-shadow:0 6px 0 rgba(0,0,0,.35)}
+#cap.cs-yellow{background:#ffd400;color:#111;border-radius:10px}
+#cap.cs-yellow b{color:#d10000}
+#cap.cs-white{background:#fff;color:#111;border-radius:14px;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+#cap.cs-white b{color:#e0006e}
+#cap.cs-big{background:none;font-size:96px;-webkit-text-stroke:12px #000;paint-order:stroke fill}
+</style></head>
+<body><div id="root"></div>
+<script>
+function esc(s){return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+window.renderLayer=function(kind,d){
+  const r=document.getElementById('root');
+  if(kind==='news'){
+    r.innerHTML=`<div id="stage">
+      <div id="top" class="abs"><div class="txt">${esc(d.headline_top)}</div>
+        <div id="logo"><div class="a">${esc(d.channel_a||'K360')}</div><div class="b">${esc(d.channel_b||'NEWS')}</div><div class="c">${esc(d.clock||'08:17 PM')}</div></div></div>
+      ${d.split===false?'':'<div class="abs divider"></div>'}
+      ${d.left_name?`<div id="pl" class="abs plate"><div class="n">${esc(d.left_name)}</div><div class="r">${esc(d.left_role)}</div></div>`:''}
+      ${d.right_name?`<div id="pr" class="abs plate"><div class="n">${esc(d.right_name)}</div><div class="r">${esc(d.right_role)}</div></div>`:''}
+      <div id="brk" class="abs"><span class="w">${esc(d.breaking_a||'BREAKING')}</span><span class="y">${esc(d.breaking_b||'NEWS')}</span></div>
+      <div id="bot" class="abs">${esc(d.headline_bottom)}</div>
+      <div id="tk" class="abs"><div class="lab">${esc(d.ticker_label||'TOP NEWS')}</div></div>
+    </div>`;
+    return [0,0,1080,1920];
+  }
+  if(kind==='live'){r.innerHTML=`<div id="stage" style="width:200px;height:80px"><div id="live" class="abs" style="left:0;top:0">● LIVE</div></div>`;
+    const b=document.getElementById('live').getBoundingClientRect();return [0,0,Math.ceil(b.width),Math.ceil(b.height)];}
+  if(kind==='ticker'){
+    const st=d.style||{}, h=d.h||80;
+    r.innerHTML=`<div id="strip" style="height:${h}px;font-size:${st.size||Math.round(h*0.5)}px;color:${st.color||'#111'};background:${st.bg||'#fff'}">${d.items.map(t=>`<span class="dot" style="color:${st.dot||'#c40000'}">${st.sep||'◆'}</span>`+esc(t)).join('')}</div>`;
+    const b=document.getElementById('strip').getBoundingClientRect();return [0,0,Math.ceil(b.width),h];
+  }
+  if(kind==='html'){
+    // free-form graphic: Claude writes any HTML/CSS for this ad (price tags, chat bubbles, stickers, lower-thirds...)
+    r.innerHTML=`<style>${d.css||''}</style><div id="hl" style="position:relative;width:${d.w}px;height:${d.h}px;overflow:hidden">${d.html}</div>`;
+    return [0,0,d.w,d.h];
+  }
+  if(kind==='caption'){
+    // **word** => highlight; style: box | outline | yellow | white | big
+    const h=esc(d.text).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+    r.innerHTML=`<div id="cap" class="cs-${d.style||'box'}">${h}</div>`;
+    const b=document.getElementById('cap').getBoundingClientRect();return [0,0,Math.ceil(b.width),Math.ceil(b.height)];
+  }
+};
+</script></body></html>

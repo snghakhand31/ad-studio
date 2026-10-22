@@ -1,0 +1,129 @@
+{
+  "output": "final.mp4",
+  "caption_style": "outline",
+  "css": ".sticker{font-family:Mukta;font-weight:800;color:#fff;background:#e0006e;border-radius:28px;padding:18px 34px;font-size:64px;display:inline-block;transform:rotate(-3deg);box-shadow:0 10px 0 #7a003c} .tag{font-family:Anton;font-size:54px;color:#111;background:#ffd400;padding:8px 22px;border-radius:12px}",
+  "scenes": [
+    {
+      "layout": "custom",
+      "duration": 4.5,
+      "fade_in": 0.15,
+      "layers": [
+        {
+          "type": "video",
+          "src": "clips/b1.mp4",
+          "rect": "full"
+        },
+        {
+          "type": "box",
+          "rect": [
+            0,
+            0,
+            1080,
+            1920
+          ],
+          "color": "black@0.25"
+        },
+        {
+          "type": "html",
+          "rect": [
+            60,
+            260,
+            960,
+            260
+          ],
+          "html": "<div class='sticker'>दिवाली पर ये गलती मत करना ❌</div>",
+          "anim": {
+            "in": "slide-up"
+          },
+          "at": 0.2
+        }
+      ],
+      "audio": {
+        "file": "clips/g2.mp4"
+      },
+      "caption": "इस दिवाली **फ़ॉरवर्ड मैसेज** मत भेजिए"
+    },
+    {
+      "layout": "custom",
+      "duration": 3.4,
+      "layers": [
+        {
+          "type": "video",
+          "src": "clips/g2.mp4",
+          "start": 3.2,
+          "rect": [
+            0,
+            0,
+            1080,
+            960
+          ],
+          "id": "top"
+        },
+        {
+          "type": "video",
+          "src": "clips/b2.mp4",
+          "rect": [
+            0,
+            960,
+            1080,
+            960
+          ]
+        },
+        {
+          "type": "box",
+          "rect": [
+            0,
+            955,
+            1080,
+            10
+          ],
+          "color": "white"
+        },
+        {
+          "type": "html",
+          "rect": [
+            40,
+            1000,
+            500,
+            110
+          ],
+          "html": "<span class='tag'>REAL REACTION</span>",
+          "anim": {
+            "in": "slide-left"
+          },
+          "at": 0.3
+        }
+      ],
+      "audio": {
+        "from": "top"
+      },
+      "caption_y": 880,
+      "caption": "अपने **नाम और फ़ोटो** से | शुभकामना भेजिए"
+    },
+    {
+      "layout": "full",
+      "clips": [
+        {
+          "clip": "clips/ss2.png"
+        },
+        {
+          "clip": "clips/ss3.png"
+        }
+      ],
+      "audio": {
+        "file": "clips/g3.mp4"
+      },
+      "duration": 7.4,
+      "caption_style": "yellow",
+      "caption_y": 1760,
+      "caption": "**रंग ऐप** खोलिए | अपना **नाम और फ़ोटो** डालिए | सीधे **व्हाट्सऐप** पर भेजिए"
+    },
+    {
+      "layout": "endcard",
+      "image": "clips/icon.png",
+      "image_width": 420,
+      "duration": 2.5,
+      "cta": "**रंग ऐप** डाउनलोड करें|हर एहसास का अपना रंग"
+    }
+  ]
+}

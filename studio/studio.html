@@ -1,0 +1,349 @@
+<title>Y2G Ad Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&family=Mukta:wght@500;700&display=swap">
+<style>
+/* Layout: an edit bay. A slim top bar with the REC mark, a "bin" of jobs, and a viewer panel for the open job. */
+:root{
+  --bg:#f1f2f6; --panel:#ffffff; --sunk:#e8eaf0; --ink:#141725; --muted:#5b6176; --line:#d9dce6;
+  --accent:#d3224b; --accent-ink:#ffffff; --accent-soft:#fbe3e9;
+  --ok:#17845a; --ok-soft:#dcf2e7; --warn:#a86a12; --warn-soft:#f8ecd6; --bad:#b62b2b; --bad-soft:#f7dede;
+  --f-display:"Bricolage Grotesque","IBM Plex Sans",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Mukta",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-hi:"Mukta","IBM Plex Sans",system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1017; --panel:#161925; --sunk:#1d2130; --ink:#e8eaf2; --muted:#9aa0b6; --line:#2a2f40;
+  --accent:#ff4a72; --accent-ink:#1a0710; --accent-soft:#3a1622;
+  --ok:#4cc58f; --ok-soft:#14321f; --warn:#e3a94a; --warn-soft:#3a2b10; --bad:#ff7070; --bad-soft:#3a1616; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1017; --panel:#161925; --sunk:#1d2130; --ink:#e8eaf2; --muted:#9aa0b6; --line:#2a2f40;
+  --accent:#ff4a72; --accent-ink:#1a0710; --accent-soft:#3a1622;
+  --ok:#4cc58f; --ok-soft:#14321f; --warn:#e3a94a; --warn-soft:#3a2b10; --bad:#ff7070; --bad-soft:#3a1616; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--panel);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:20px;padding-block:12px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:20px;letter-spacing:-.01em}
+.rec{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);animation:rec 1.6s ease-in-out infinite}
+@keyframes rec{50%{opacity:.35}} @media (prefers-reduced-motion:reduce){.rec{animation:none}}
+nav.tabs{display:flex;gap:4px;margin-left:auto;flex-wrap:wrap}
+nav.tabs a{padding:7px 12px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:500}
+nav.tabs a[aria-current="page"]{background:var(--sunk);color:var(--ink)}
+nav.tabs a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+main{padding-block:24px 64px}
+h1,h2,h3{font-family:var(--f-display);letter-spacing:-.015em;text-wrap:balance;margin:0}
+h1{font-size:clamp(26px,4vw,34px);font-weight:800} h2{font-size:21px;font-weight:800} h3{font-size:16px;font-weight:600}
+.sub{color:var(--muted);margin:6px 0 0;max-width:62ch}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.spread{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.btn{appearance:none;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:600 14px var(--f-body);padding:9px 16px;border-radius:9px;cursor:pointer;display:inline-flex;gap:8px;align-items:center}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.label{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.hi{font-family:var(--f-hi)}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 12px var(--f-body);padding:3px 10px;border-radius:999px;background:var(--sunk);color:var(--muted);white-space:nowrap}
+.chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)} .chip.live{background:var(--accent-soft);color:var(--accent)}
+.notice{padding:12px 14px;border-radius:9px;background:var(--warn-soft);color:var(--ink);border:1px solid var(--line)}
+/* jobs bin */
+.bin{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:20px}
+.job{padding:16px;display:grid;gap:10px;cursor:pointer;text-align:left;font:inherit;color:inherit}
+.job:hover{border-color:var(--muted)}
+.job .meta{display:flex;justify-content:space-between;gap:8px;color:var(--muted);font-size:13px}
+.slate{display:flex;gap:10px;align-items:baseline}
+.slate .id{font:500 12px var(--f-mono);color:var(--muted)}
+.empty{padding:40px 24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r);margin-top:20px}
+/* form */
+form.brief{display:grid;gap:18px;margin-top:20px;max-width:760px}
+.field{display:grid;gap:6px;min-width:0}
+.field label{font-weight:600}
+.field .hint{color:var(--muted);font-size:13px}
+input[type=text],input[type=url],textarea,select{width:100%;font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+textarea{min-height:170px;resize:vertical;font-family:var(--f-hi);font-size:16px;line-height:1.6}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:620px){.two{grid-template-columns:1fr}}
+.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:16px;display:grid;gap:8px;background:var(--panel)}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.files{display:grid;gap:6px;font-size:13px}
+.files div{display:flex;justify-content:space-between;gap:10px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel);flex-wrap:wrap}
+.seg label{padding:9px 14px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.seg input{accent-color:var(--accent)}
+/* job view */
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:18px}
+.step{padding:10px 10px 8px;border-top:3px solid var(--line);font-size:12px;color:var(--muted)}
+.step b{display:block;font:600 13px var(--f-body);color:var(--muted)}
+.step.done{border-color:var(--ok)} .step.done b{color:var(--ink)}
+.step.now{border-color:var(--accent)} .step.now b{color:var(--accent)}
+@media (max-width:720px){.steps{grid-template-columns:repeat(3,1fr)}}
+.grid2{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:18px;margin-top:20px;align-items:start}
+@media (max-width:900px){.grid2{grid-template-columns:minmax(0,1fr)}}
+section.blk{padding:18px;display:grid;gap:14px}
+.beats{overflow-x:auto}
+.beats table{border-collapse:collapse;width:100%;min-width:560px;font-size:14px}
+.beats th{text-align:left;font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:8px;border-bottom:1px solid var(--line)}
+.beats td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.beats td.hi{font-size:15px}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.item{display:grid;gap:10px;padding:12px;align-content:start}
+.media{background:#000;border-radius:8px;overflow:hidden;display:grid;place-items:center;aspect-ratio:9/16;max-height:420px;max-width:100%}
+.media.wide{aspect-ratio:16/9}
+.media video,.media img{width:100%;height:100%;object-fit:contain;display:block}
+.qa{font-size:12px;color:var(--muted)}
+.fb{display:grid;gap:8px}
+.fb textarea{min-height:70px;font-size:14px}
+.final video{width:100%;max-height:640px;background:#000;border-radius:10px;display:block}
+.notes{display:grid;gap:10px}
+.note{padding:10px 12px;border-radius:9px;background:var(--sunk);font-size:14px}
+.note .who{font-size:12px;color:var(--muted);margin-bottom:2px}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:14px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.script{white-space:pre-wrap;font-family:var(--f-hi);font-size:15px;background:var(--sunk);padding:12px;border-radius:9px;max-height:260px;overflow:auto}
+.lessons{display:grid;gap:10px;margin-top:20px;max-width:860px}
+.lesson{padding:14px 16px;display:grid;gap:4px}
+.lesson .area{font:500 12px var(--f-mono);color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--panel);padding:10px 16px;border-radius:9px;font-weight:600;z-index:20}
+.muted{color:var(--muted)}
+</style>
+
+<header class="top"><div class="wrap">
+  <div class="brand"><span class="rec" aria-hidden="true"></span>Y2G Ad Studio</div>
+  <nav class="tabs" aria-label="Sections">
+    <a href="#jobs" data-v="jobs">Briefs</a>
+    <a href="#new" data-v="new">New brief</a>
+    <a href="#learnings" data-v="learnings">What Claude has learned</a>
+  </nav>
+</div></header>
+
+<main class="wrap" id="app" aria-live="polite"></main>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+const STEPS=[["new","Brief received"],["planning","Script & plan"],["generating","Generating"],["review","Your review"],["rendering","Final edit"],["done","Delivered"]];
+const STATUS={new:["Brief received",""],planning:["Planning",""],awaiting_plan:["Plan ready for you","live"],generating:["Generating clips",""],qa:["Quality check",""],awaiting_review:["Clips ready for you","live"],revising:["Applying your feedback","warn"],rendering:["Final edit",""],review_final:["Final ready for you","live"],done:["Delivered","ok"]};
+const STEP_OF={new:0,planning:1,awaiting_plan:1,generating:2,qa:2,awaiting_review:3,revising:3,rendering:4,review_final:4,done:5};
+const FORMATS=["Match the reference video","Let Claude decide","News debate","UGC testimonial","Problem → solution","Split-screen reaction","Text-on-screen / meme","Demo walkthrough","Founder / expert talk","Before / after","Festival moment"];
+
+let db=null,assets=null,downloads=null,user=null,uid=null,canWrite=null;
+let jobs=[],lessons=[],cur=null,unsubJob=[],newFiles={ref:null,extra:[]};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const ago=t=>{if(!t)return"";const s=(Date.now()-new Date(t))/1000;if(s<60)return"just now";if(s<3600)return Math.round(s/60)+" min ago";if(s<86400)return Math.round(s/3600)+" h ago";return new Date(t).toLocaleDateString("en-IN",{day:"numeric",month:"short"})};
+function toast(m){const t=$("#toast");t.textContent=m;t.hidden=false;clearTimeout(t._h);t._h=setTimeout(()=>t.hidden=true,2600)}
+function chip(status){const [l,c]=STATUS[status]||[status||"—",""];return `<span class="chip ${c}">${esc(l)}</span>`}
+function qaChip(v){return v?`<span class="chip ${v==="pass"?"ok":v==="warn"?"warn":"bad"}">QA ${esc(v)}</span>`:""}
+
+function view(){const h=(location.hash||"#jobs").slice(1);return h||"jobs"}
+function setNav(v){document.querySelectorAll("nav.tabs a").forEach(a=>a.setAttribute("aria-current",(v===a.dataset.v||(v.startsWith("job-")&&a.dataset.v==="jobs"))?"page":"false"))}
+window.addEventListener("hashchange",route);
+
+function route(){
+  const v=view();setNav(v);unsubJob.forEach(u=>u());unsubJob=[];cur=null;
+  if(v==="new")return renderNew();
+  if(v==="learnings")return renderLessons();
+  if(v.startsWith("job-"))return openJob(v.slice(4));
+  renderJobs();
+}
+
+/* ---------- briefs list ---------- */
+function renderJobs(){
+  const app=$("#app");
+  const list=jobs.slice().sort((a,b)=>(b.updated||"").localeCompare(a.updated||""));
+  app.innerHTML=`<div class="spread"><div><h1>Briefs</h1><p class="sub">Every ad you have asked for, with where it is right now. Open one to review clips and leave feedback.</p></div>
+    <a class="btn primary" href="#new">New brief</a></div>
+    ${!db?`<p class="notice" style="margin-top:18px">Sign in to claude.ai to see and send briefs. If you were sent this link, ask for an Editor invite on your email.</p>`:""}
+    ${list.length?`<div class="bin">${list.map(j=>`<button class="panel job" data-id="${esc(j.id)}">
+        <div class="slate"><h3>${esc(j.title||"Untitled ad")}</h3><span class="id">${esc(j.id)}</span></div>
+        <div>${chip(j.status)}</div>
+        <div class="meta"><span>${esc(j.product?.name||"")}${j.format?" · "+esc(j.format):""}</span><span class="mono">${j.final?.version?"v"+esc(j.final.version)+" · ":""}${ago(j.updated)}</span></div>
+      </button>`).join("")}</div>`
+    :`<div class="empty"><h2>No briefs yet</h2><p class="sub" style="margin:8px auto 16px">Send a script and a reference ad. Claude plans it, generates the clips, checks them, and posts them here for your review.</p><a class="btn primary" href="#new">Send your first brief</a></div>`}`;
+  app.querySelectorAll(".job").forEach(b=>b.onclick=()=>location.hash="job-"+b.dataset.id);
+}
+
+/* ---------- new brief ---------- */
+function renderNew(){
+  const app=$("#app");newFiles={ref:null,extra:[]};
+  app.innerHTML=`<h1>New brief</h1><p class="sub">Paste the script as you have it, in Hindi, Hinglish or English. Add the ad you want it to look like. Claude does the rest and shows you each step.</p>
+  <form class="brief" id="briefForm" novalidate>
+    <div class="two">
+      <div class="field"><label for="f-title">Ad name</label><input type="text" id="f-title" required placeholder="Diwali hook, pandit debate"></div>
+      <div class="field"><label for="f-product">Product or app</label><input type="text" id="f-product" required placeholder="Rang"></div>
+    </div>
+    <div class="field"><label for="f-link">Play Store or website link</label><input type="url" id="f-link" placeholder="https://play.google.com/store/apps/details?id=…"><span class="hint">Claude pulls the real app screens from here for the demo part.</span></div>
+    <div class="field"><label for="f-script">Script</label><textarea id="f-script" required placeholder="अगर मेरी बात गलत निकले…&#10;&#10;Rough is fine. Lines, ideas, or a full VO."></textarea></div>
+    <div class="two">
+      <div class="field"><label for="f-format">Format</label><select id="f-format">${FORMATS.map(f=>`<option>${esc(f)}</option>`).join("")}</select></div>
+      <div class="field"><label for="f-length">Length</label><select id="f-length"><option>15–20 s</option><option selected>25–30 s</option><option>30–45 s</option></select></div>
+    </div>
+    <div class="field"><span class="label">Reference ad</span>
+      <div class="drop" id="dropRef"><div>Drop the reference video here or <label class="btn" for="f-ref" style="display:inline-flex">choose file</label></div>
+        <input type="file" id="f-ref" accept="video/*" hidden><span class="hint">MP4 up to 20 MB. Or paste a link below.</span><div class="files" id="refList"></div></div>
+      <input type="url" id="f-reflink" placeholder="or a link (Drive, Instagram, YouTube)">
+    </div>
+    <div class="field"><span class="label">Logo, app recordings, product shots (optional)</span>
+      <div class="drop" id="dropExtra"><div>Drop files or <label class="btn" for="f-extra" style="display:inline-flex">choose files</label></div>
+        <input type="file" id="f-extra" accept="video/*,image/*" multiple hidden><div class="files" id="extraList"></div></div>
+    </div>
+    <div class="field"><span class="label">How involved do you want to be?</span>
+      <div class="seg" role="radiogroup">
+        <label><input type="radio" name="mode" value="review" checked> Review the plan and clips first</label>
+        <label><input type="radio" name="mode" value="auto"> Just send the final video</label>
+      </div></div>
+    <div class="field"><label for="f-notes">Anything else</label><textarea id="f-notes" style="min-height:90px" placeholder="Voice: older male, calm. Avoid red. Must say 'free'…"></textarea></div>
+    <div class="row"><button class="btn primary" id="submitBtn" type="submit">Send brief</button><span class="muted" id="formMsg"></span></div>
+  </form>`;
+  if(!db){$("#submitBtn").disabled=true;$("#formMsg").textContent="Sign in to claude.ai to send a brief."}
+  const bindDrop=(zone,input,multi)=>{
+    const take=fl=>{for(const f of fl){if(f.size>20*1024*1024){toast(f.name+" is over 20 MB");continue}
+      if(multi)newFiles.extra.push(f);else newFiles.ref=f}listFiles()};
+    input.onchange=()=>take(input.files);
+    zone.ondragover=e=>{e.preventDefault();zone.classList.add("over")};zone.ondragleave=()=>zone.classList.remove("over");
+    zone.ondrop=e=>{e.preventDefault();zone.classList.remove("over");take(e.dataTransfer.files)};
+  };
+  const listFiles=()=>{
+    const mb=b=>(b/1048576).toFixed(1)+" MB";
+    $("#refList").innerHTML=newFiles.ref?`<div><span>${esc(newFiles.ref.name)}</span><span class="mono">${mb(newFiles.ref.size)}</span></div>`:"";
+    $("#extraList").innerHTML=newFiles.extra.map(f=>`<div><span>${esc(f.name)}</span><span class="mono">${mb(f.size)}</span></div>`).join("");
+  };
+  bindDrop($("#dropRef"),$("#f-ref"),false);bindDrop($("#dropExtra"),$("#f-extra"),true);
+  $("#briefForm").onsubmit=async e=>{
+    e.preventDefault();
+    const title=$("#f-title").value.trim(),product=$("#f-product").value.trim(),script=$("#f-script").value.trim();
+    if(!title||!product||!script){$("#formMsg").textContent="Add an ad name, the product and the script.";return}
+    const btn=$("#submitBtn");btn.disabled=true;$("#formMsg").textContent="Uploading…";
+    try{
+      const up=async f=>{if(!assets)throw{code:"no_assets"};const r=await assets.upload(f);return{id:r.id,url:r.url,name:f.name,size:f.size,type:f.type}};
+      const ref=newFiles.ref?await up(newFiles.ref):null;const extra=[];for(const f of newFiles.extra)extra.push(await up(f));
+      const id=(product.toLowerCase().replace(/[^a-z0-9]+/g,"-").slice(0,18)+"-"+Date.now().toString(36).slice(-5)).replace(/^-+/,"");
+      const now=new Date().toISOString();
+      await db.collection("jobs").doc(id).set({id,title,product:{name:product,link:$("#f-link").value.trim()},script,format:$("#f-format").value,length:$("#f-length").value,
+        reference:ref,reference_link:$("#f-reflink").value.trim(),extra,review_mode:document.querySelector("input[name=mode]:checked").value,
+        notes:$("#f-notes").value.trim(),status:"new",created:now,updated:now,created_by:uid||null});
+      toast("Brief sent");location.hash="job-"+id;
+    }catch(err){btn.disabled=false;
+      $("#formMsg").textContent=err?.code==="no_assets"?"File upload needs Editor access. Send the brief without files and paste a link instead.":
+        err?.code==="invalid_argument"?"You can view this studio but not send briefs. Ask for Editor access.":"Could not send. Check your connection and try again.";}
+  };
+}
+
+/* ---------- one job ---------- */
+function openJob(id){
+  if(!db){$("#app").innerHTML=`<p class="notice">Sign in to claude.ai to open this brief.</p>`;return}
+  const st={job:null,items:[],notes:[]};cur=st;
+  const draw=()=>{if(cur===st)renderJob(st)};
+  unsubJob.push(db.doc("jobs/"+id).onSnapshot(s=>{st.job=s.exists?{...s.data(),id:s.id}:false;draw()},()=>{}));
+  unsubJob.push(db.collection("jobs/"+id+"/items").onSnapshot(s=>{st.items=s.docs.map(d=>({...d.data(),id:d.id}));draw()},()=>{}));
+  unsubJob.push(db.collection("jobs/"+id+"/notes").onSnapshot(s=>{st.notes=s.docs.map(d=>({...d.data(),id:d.id}));draw()},()=>{}));
+  $("#app").innerHTML=`<p class="muted">Loading brief…</p>`;
+}
+const drafts={};
+function renderJob(st){
+  const app=$("#app"),j=st.job;
+  if(j===false){app.innerHTML=`<p class="notice">This brief does not exist or you don't have access.</p><p><a href="#jobs">Back to briefs</a></p>`;return}
+  if(!j)return;
+  // keep unsent feedback text across live re-renders
+  app.querySelectorAll("textarea[data-draft]").forEach(t=>drafts[t.dataset.draft]=t.value);
+  const stepIx=STEP_OF[j.status]??0;
+  const groups=[["plan","Script & plan"],["character","Characters"],["clip","Clips"],["final","Final video"]];
+  const items=st.items.slice().sort((a,b)=>(a.order??0)-(b.order??0));
+  const pending=items.filter(i=>i.status==="pending_review").length;
+  const beats=j.plan?.beats||[];
+  app.innerHTML=`<p><a href="#jobs" class="muted">← Briefs</a></p>
+  <div class="spread"><div><div class="slate"><h1>${esc(j.title)}</h1><span class="id mono">${esc(j.id)}</span></div>
+    <p class="sub">${esc(j.product?.name||"")} · ${esc(j.format||"")} · ${esc(j.length||"")} · ${j.review_mode==="auto"?"final only":"review each step"}</p></div>
+    <div>${chip(j.status)}</div></div>
+  <div class="steps">${STEPS.map(([k,l],i)=>`<div class="step ${i<stepIx?"done":i===stepIx?"now":""}"><b>${esc(l)}</b>${i===stepIx&&j.status_note?esc(j.status_note):""}</div>`).join("")}</div>
+  ${pending?`<p class="notice" style="margin-top:16px">${pending} item${pending>1?"s":""} waiting for your approval below. Approve, or write what to change and Claude will redo it.</p>`:""}
+  <div class="grid2">
+    <div style="display:grid;gap:18px;min-width:0">
+      ${j.final?.url?`<section class="panel blk final"><div class="spread"><h2>Final video</h2><span class="mono muted">v${esc(j.final.version||1)} · ${esc(j.final.duration||"")}</span></div>
+        <video src="${esc(j.final.url)}" controls playsinline preload="metadata"></video>
+        <div class="row"><button class="btn primary" id="dlBtn">Download MP4</button>${j.final.credits?`<span class="muted mono">${esc(j.final.credits)} Flow credits</span>`:""}</div></section>`:""}
+      ${beats.length?`<section class="panel blk"><h2>Script & plan</h2><div class="beats"><table><thead><tr><th>Beat</th><th>Time</th><th>On screen</th><th>Line</th></tr></thead><tbody>
+        ${beats.map(b=>`<tr><td><b>${esc(b.beat)}</b></td><td class="mono">${esc(b.time||"")}</td><td>${esc(b.visual||"")}</td><td class="hi">${esc(b.line||"")}${b.headline?`<div class="muted" style="font-size:13px">${esc(b.headline)}</div>`:""}</td></tr>`).join("")}
+        </tbody></table></div></section>`:""}
+      ${groups.map(([k,l])=>{const g=items.filter(i=>(i.kind||"clip")===k);if(!g.length)return"";
+        return `<section class="panel blk"><h2>${l}</h2><div class="items">${g.map(itemCard).join("")}</div></section>`}).join("")}
+      ${!items.length&&!beats.length&&!j.final?.url?`<section class="panel blk"><h2>Nothing to review yet</h2><p class="sub">Claude posts the plan here first, then the characters and clips as they pass quality checks.</p></section>`:""}
+    </div>
+    <aside style="display:grid;gap:18px;min-width:0">
+      <section class="panel blk"><h2>Feedback for the whole ad</h2>
+        <div class="notes">${st.notes.slice().sort((a,b)=>(a.at||"").localeCompare(b.at||"")).map(n=>`<div class="note"><div class="who">${n.from==="claude"?"Claude":"You"} · ${ago(n.at)}</div>${esc(n.text)}</div>`).join("")||`<p class="muted" style="margin:0">Say anything here: tone, pacing, a different hook, a new line. Claude reads it before every change and remembers it for next time.</p>`}</div>
+        <div class="fb"><label class="label" for="noteBox">Your note</label><textarea id="noteBox" data-draft="note-${esc(j.id)}" placeholder="Hook thoda aur shocking chahiye…"></textarea>
+        <button class="btn" id="noteBtn">Send note</button></div></section>
+      <section class="panel blk"><h2>Brief</h2>
+        <dl class="kv"><dt>Product</dt><dd>${j.product?.link?`<a href="${esc(j.product.link)}" target="_blank" rel="noopener">${esc(j.product.name)}</a>`:esc(j.product?.name||"")}</dd>
+        <dt>Reference</dt><dd>${j.reference?.url?`<a href="${esc(j.reference.url)}" target="_blank" rel="noopener">${esc(j.reference.name)}</a>`:j.reference_link?`<a href="${esc(j.reference_link)}" target="_blank" rel="noopener">link</a>`:"—"}</dd>
+        <dt>Files</dt><dd>${(j.extra||[]).map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(f.name)}</a>`).join(", ")||"—"}</dd>
+        <dt>Sent</dt><dd>${ago(j.created)}</dd></dl>
+        <div class="script">${esc(j.script)}</div>${j.notes?`<p class="muted" style="margin:0">${esc(j.notes)}</p>`:""}</section>
+    </aside>
+  </div>`;
+  app.querySelectorAll("textarea[data-draft]").forEach(t=>{if(drafts[t.dataset.draft])t.value=drafts[t.dataset.draft]});
+  app.querySelectorAll("[data-approve]").forEach(b=>b.onclick=()=>feedback(j.id,b.dataset.approve,"approved"));
+  app.querySelectorAll("[data-change]").forEach(b=>b.onclick=()=>{const t=app.querySelector(`textarea[data-draft="it-${b.dataset.change}"]`);
+    if(!t.value.trim()){t.focus();toast("Write what should change");return}feedback(j.id,b.dataset.change,"changes_requested",t.value.trim(),t)});
+  $("#noteBtn").onclick=async()=>{const t=$("#noteBox"),v=t.value.trim();if(!v)return;
+    try{await db.collection("jobs/"+j.id+"/notes").add({text:v,from:"client",by:uid||null,at:new Date().toISOString()});
+      await db.doc("jobs/"+j.id).update({has_new_feedback:true,updated:new Date().toISOString()});
+      t.value="";drafts[t.dataset.draft]="";toast("Note sent")}catch(e){toast("Only editors can send notes")}};
+  const dl=$("#dlBtn");if(dl)dl.onclick=async()=>{if(!downloads){window.open(j.final.url,"_blank");return}
+    try{dl.disabled=true;const blob=await (await fetch(j.final.url)).blob();await downloads.save({filename:(j.title||"ad").replace(/[^\w\- ]+/g,"").trim().replace(/\s+/g,"_")+"_v"+(j.final.version||1)+".mp4",data:blob})}
+    catch(e){if(e?.code&&e.code!=="cancelled")toast("Download did not start. Try again.")}finally{dl.disabled=false}};
+}
+function itemCard(i){
+  const isVid=/video/.test(i.type||"")||/\.(mp4|webm|mov)(\?|$)/i.test(i.url||"");
+  const wide=i.aspect==="16:9";
+  const st=i.status==="approved"?`<span class="chip ok">Approved</span>`:i.status==="changes_requested"?`<span class="chip warn">Change requested</span>`:i.status==="pending_review"?`<span class="chip live">Needs your OK</span>`:i.status==="replaced"?`<span class="chip">Replaced</span>`:"";
+  return `<article class="panel item"><div class="spread"><h3>${esc(i.title||"Item")}</h3>${st}</div>
+    ${i.url&&i.kind!=="final"?`<div class="media ${wide?"wide":""}">${isVid?`<video src="${esc(i.url)}" controls playsinline preload="metadata"></video>`:`<img src="${esc(i.url)}" alt="${esc(i.title||"")}" loading="lazy">`}</div>`:""}
+    ${i.text?`<div class="hi" style="white-space:pre-wrap">${esc(i.text)}</div>`:""}
+    <div class="row">${qaChip(i.qa?.verdict)}${i.version?`<span class="chip">take ${esc(i.version)}</span>`:""}</div>
+    ${i.qa?.note?`<div class="qa">${esc(i.qa.note)}</div>`:""}
+    ${i.feedback?`<div class="note"><div class="who">Your feedback</div>${esc(i.feedback)}</div>`:""}
+    ${i.reply?`<div class="note"><div class="who">Claude</div>${esc(i.reply)}</div>`:""}
+    ${i.status==="pending_review"?`<div class="fb"><textarea data-draft="it-${esc(i.id)}" placeholder="What should change? (leave empty to approve)"></textarea>
+      <div class="row"><button class="btn ok" data-approve="${esc(i.id)}">Approve</button><button class="btn" data-change="${esc(i.id)}">Request change</button></div></div>`:""}
+  </article>`;
+}
+async function feedback(jobId,itemId,status,text,ta){
+  try{const now=new Date().toISOString();
+    await db.doc(`jobs/${jobId}/items/${itemId}`).update({status,feedback:text||"",feedback_at:now,feedback_by:uid||null});
+    await db.doc("jobs/"+jobId).update({has_new_feedback:true,updated:now});
+    if(ta){ta.value="";drafts[ta.dataset.draft]=""}
+    toast(status==="approved"?"Approved":"Sent to Claude");
+  }catch(e){toast("Only editors can review. Ask for Editor access.")}
+}
+
+/* ---------- lessons ---------- */
+function renderLessons(){
+  const app=$("#app");
+  const list=lessons.slice().sort((a,b)=>(b.created||"").localeCompare(a.created||""));
+  app.innerHTML=`<h1>What Claude has learned</h1><p class="sub">Every piece of feedback and every quality failure becomes a rule Claude checks before the next ad. These rules are never deleted.</p>
+  ${list.length?`<div class="lessons">${list.map(l=>`<article class="panel lesson"><span class="area">${esc(l.area||"general")}</span><div>${esc(l.text)}</div><span class="muted" style="font-size:12px">${esc(l.source||"")}${l.created?" · "+new Date(l.created).toLocaleDateString("en-IN",{day:"numeric",month:"short",year:"numeric"}):""}</span></article>`).join("")}</div>`
+  :`<div class="empty"><h2>No lessons yet</h2><p class="sub" style="margin:8px auto 0">They appear here as soon as you give feedback on a brief.</p></div>`}`;
+}
+
+/* ---------- boot ---------- */
+route();
+(async()=>{
+  const C=window.claude; if(!C?.use)return;
+  [db,assets,downloads,user]=await Promise.all([C.use("db"),C.use("assets"),C.use("downloads"),C.use("user")]);
+  try{uid=user?await user.id():null}catch(e){}
+  if(!db){route();return}
+  db.collection("jobs").onSnapshot(s=>{jobs=s.docs.map(d=>({...d.data(),id:d.id}));const v=view();if(v==="jobs")renderJobs()},()=>{});
+  db.collection("lessons").onSnapshot(s=>{lessons=s.docs.map(d=>({...d.data(),id:d.id}));if(view()==="learnings")renderLessons()},()=>{});
+  route();
+})();
+</script>
