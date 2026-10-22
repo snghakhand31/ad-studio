@@ -2,6 +2,16 @@
 
 Brief in → finished 9:16 video ad out, any format. Clients send briefs and review in a shared **Studio** page; Claude Code plans, generates (Google Flow: Veo 3.1 + Nano Banana, on your Gemini subscription, via Claude in Chrome), QA-checks, fixes, edits and delivers. Every piece of feedback becomes a permanent rule in `LESSONS.md`.
 
+## Try it on any laptop (2 minutes)
+1. Install the **Claude desktop app**, sign in, open **Claude Code**, and in Chrome add the **Claude in Chrome** extension.
+2. In Claude Code, say:
+   > Clone https://github.com/snghakhand31/ad-studio, open it, and run setup.sh
+3. Sign in to **flow.google.com** in Chrome with a Google AI Pro/Ultra account.
+4. Attach a reference ad and say:
+   > Is reference jaisa ad banao. App: <Play Store link>. Script: <your script>
+
+Claude reads `CLAUDE.md` + `LESSONS.md`, plans the ad, generates clips in Flow, checks and fixes them, and hands you the MP4.
+
 ## Setup (once)
 1. Open this folder in Claude Code (desktop app or claude.ai/code with your computer linked). `bash setup.sh`.
 2. Chrome with the Claude extension connected; sign in to flow.google.com with your Google AI Pro/Ultra account.
